@@ -7,25 +7,30 @@
 字典（dict）类型是一种可变容器类型，可存储任意类型对象，关键词dict。  
 
 *example*：d={ key1 : value1 , key2 : value2 }
-'''py
+
+~~~python
 >>>tinydict = {'a':1,'b':2,'b':'3'}
 >>>tinydict['b']
 '3'
 >>>tinydict
 {'a':1,'b':'3'}
-'''
+~~~
+
 在字典中健是唯一的，重复后后面会替代前面，值不需要唯一。且值可以取任何数据类型，但是键必须是不可变的，如字符串，数字或元组。
 
 ### 访问字典
-'''py
+
+~~~python
 >>>tinydict = {'name':'zara','age':7,'class':'first'}
 >>>print("tinydict['name']:",tinydict['name']) 
 tinydict['name']:zara
-'''
+~~~
+
 如果访问的键不存在则会报错。
 
 ### 修改字典
-'''py
+
+~~~python
 >>>tinydict = {'name':'zara','age':7,'class':'first'}
 >>>tinydict['age'] = 8 #更新
 >>>tinydict['school'] = "RUN00B" #添加
@@ -33,11 +38,12 @@ tinydict['name']:zara
 >>>print(tinydict['school'])
 8
 RUN00B
-'''
+~~~
 
 ### 删除字典元素
 可删除单一元素，也可清空
-'''py
+
+~~~python
 >>>tinydict = {'name':'zara','age':7,'class':'first'}
 >>>del tinydict['name'] # 删除键是‘name’的条目
 >>>tinydict.clear()     # 清空所有条目
@@ -46,27 +52,31 @@ RUN00B
 >>>print (tinydict['age'])
 >>>print (tinydict['school'])
 Error
-'''
+~~~
+
 这是由于删除字典后，字典不存在，所以有异常抛出
 
 ### 字典键的特性
 字典值可以取任何python中的对象，甚至可以是用户自定义的。但是键不行。有两点需要记住：
 
 1) 不允许同一个键出现两次。创建时出现两次后一个会被记住。
-'''py
+
+~~~python
 >>>tinydict = {'name':'runoob','age':7,'name':'manni'}
 >>>print(tinydict['name'])
 manni
-'''
+~~~
+
 2) 键必须不可变，所以可以用数字，字符串或者元组充当，用列表不行
-'''py
+
+~~~python
 >>>tinydict = {['name']:'zara','age':7}
 >>>print(tinydict['name'])
 Traceback (most recent call last):
   File "test.py", line 3, in <module>
     tinydict = {['Name']: 'Zara', 'Age': 7} 
 TypeError: unhashable type: 'list'
-'''
+~~~
 
 ### 内置函数和方法
 |序号 |函数及描述|
@@ -101,7 +111,7 @@ TypeError: unhashable type: 'list'
 ### 解题思路
 对于任意一个字符串s，则只需要从第一个字符开始找它的最大不重复串，记录串长，接着从第二个字符串开始找它的最大不重复串...一直遍历到最后一个，输出所有的串长最长的就好了。这是一种最笨的方法。但是实现起来较为简单方便。
 
-'''python
+~~~python
 class Solution:
 	def lengthOfLongestSubstring(self,s: str) -> int:
 		k,res,c_dict = -1,0,{}
@@ -113,8 +123,95 @@ class Solution:
 				c_dict[c]=i
 				res=max(res,i-k)
 		return res
-'''
-我们来解释下这个程序的细节，首先创建了字典结构体c_dict，然后进入循环，重点是enumerate()函数，python中的这个函数
+~~~
+我们来解释下这个程序的细节，首先创建了字典结构体c_dict，然后进入循环，重点是enumerate()函数，python内置的这个函数用于将一个可遍历的数据对象（如列表，元组或字符串）组合为一个索引序列，同时列出数据和数据下标。
+
+#### 语法
+
+~~~python
+enumerate(sequence,[start=0])
+~~~
+#### 参数
+- sequence——一个序列，迭代器或其他支持迭代的对象
+- start——下标起始位置的值
+
+#### 返回值
+返回enumerate（枚举）对象
+
+#### 实际例子
+~~~python
+>>> s="abcag"
+>>> list(enumerate(s))
+[(0,'a'),(1,'b'),(2,'c'),(3,'a'),(4,'g')]
+>>> list(enumerate(s,start=1))
+[(1,'b'),(2,'c'),(3,'a'),(4,'g')]
+~~~
+使用for循环使用enumerate
+~~~python
+>>> seq=['one','two','three']
+>>> for element in seq:
+···			print i, seq[i]
+···			i +=1
+···
+0 one
+1 two
+3 three
+~~~
+
+我们来运行下程序
+~~~python
+def lengthOfLongestSubstring(s):
+	k,res,c_dict = -1,0,{}
+	for i, c in enumerate(s):
+		if c in c_dict and c_dict[c] > k:
+			k=c_dict[c]
+			c_dict[c]=i
+			print("k:",k)
+		else:
+			c_dict[c]=i
+			res=max(res,i-k)
+			print("res",res)
+	return res
+lengthOfLongestSubstring('abcabcg')
+
+res 1
+res 2
+res 3
+k: 0
+k: 1
+k: 2
+res 4
+Out[19]:4
+~~~
+我们可以看到，先把k记为-1，则可以计数最大的不重复串长度为3，当走到第四个字符a时，发现和前面重复，于是将k指向前面的a，其实就是要从前面a的后一个字符开始计数了，当然如果走到第四个字符是b，则将指针指到b，从b的后一个开始计数，然后再看看b后面的不重复串长是否长过原来的，长过就更新。
+~~~python
+def lengthOfLongestSubstring(s):
+	k,res,c_dict = -1,0,{}
+	for i, c in enumerate(s):
+		if c in c_dict and c_dict[c] > k:
+			k=c_dict[c]
+			c_dict[c]=i
+			print("k:",k)
+		else:
+			c_dict[c]=i
+			res=max(res,i-k)
+			print("res",res)
+	return res
+lengthOfLongestSubstring('abcaefsg')
+
+res 1
+res 2
+res 3
+k: 0
+res 4
+res 5
+res 6
+res 7
+Out[20]:7
+~~~
+
+
+
 
 
 
